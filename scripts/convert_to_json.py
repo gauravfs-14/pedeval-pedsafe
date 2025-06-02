@@ -47,3 +47,17 @@ for excel_file, output_json in zip(EXCEL_FILES, OUTPUT_JSONS):
         json.dump(geojson_like, f, indent=2)
 
     print(f"GeoJSON-style JSON saved to {output_json}")
+
+import gzip
+import shutil
+
+def compress_to_gzip(input_file, output_file):
+    with open(input_file, 'rb') as f_in:
+        with gzip.open(output_file, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+
+# === Compress JSON files to .json.gz ===
+for output_json in OUTPUT_JSONS:
+    gz_path = output_json + ".gz"
+    compress_to_gzip(output_json, gz_path)
+    print(f"Compressed to: {gz_path}")

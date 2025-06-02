@@ -43,3 +43,5 @@ next-env.d.ts
 # excel files
 *.xlsx
 *.xls
+
+src/data/*.json
