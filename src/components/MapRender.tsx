@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import * as React from "react";
 import Map, { Marker, NavigationControl, Popup } from "react-map-gl/maplibre";
