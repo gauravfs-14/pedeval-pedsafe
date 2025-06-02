@@ -7,11 +7,11 @@ import { HOME_SECTIONS, PAPER_LINK } from "@/data/site";
 
 export default function DownloadCTA() {
   return (
-    <Card className="bg-accent/20 shadow-sm rounded-2xl text-center mx-10 p-10">
+    <Card className="bg-accent/20 shadow-sm rounded-2xl text-center mx-2 md:mx-5 lg:mx-10 px-2 lg:px-5 xl:px-10 py-10">
       <CardHeader className="text-3xl font-bold -mb-5">
         {HOME_SECTIONS.find((section) => section.type === "cta")?.title || ""}
       </CardHeader>
-      <CardContent className="text-muted-foreground text-base leading-relaxed max-w-[90%] mx-auto -mb-2">
+      <CardContent className="text-muted-foreground text-base leading-relaxed max-w-[100%] md:max-w-[95%] xl:max-w-[90%] mx-auto -mb-2">
         {HOME_SECTIONS.find((section) => section.type === "cta")?.description ||
           ""}
       </CardContent>

@@ -10,10 +10,10 @@ export default function FAQ() {
   return (
     <div>
       <div className="text-center mb-10">
-        <h2 className="relative text-4xl font-extrabold tracking-tight text-foreground mb-4 after:content-[''] after:block after:mx-auto after:mt-3 after:h-[3px] after:w-24 after:bg-gradient-to-r after:from-primary after:to-accent-foreground/70 after:rounded-full">
+        <h2 className="relative text-2xl md:text-3xl xl:text-4xl font-extrabold tracking-tight text-foreground mb-4 after:content-[''] after:block after:mx-auto after:mt-3 after:h-[3px] after:w-24 after:bg-gradient-to-r after:from-primary after:to-accent-foreground/70 after:rounded-full">
           {HOME_SECTIONS.find((section) => section.type === "faq")?.title || ""}
         </h2>
-        <p className="text-md text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-sm xl:text-md text-muted-foreground max-w-2xl mx-auto">
           {HOME_SECTIONS.find((section) => section.type === "faq")
             ?.description || ""}
         </p>
