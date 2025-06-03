@@ -15,6 +15,7 @@ import Supercluster from "supercluster";
 import { Button } from "./ui/button";
 import { X } from "lucide-react";
 import useTexasGEOJson from "@/lib/useTexasGEOJson";
+import * as turf from "@turf/turf";
 
 interface MapRenderProps {
   initialViewState?: {
@@ -50,6 +51,11 @@ export default function MapRender({
   const [clusters, setClusters] = React.useState<any[]>([]);
   const [showPopup, setShowPopup] = React.useState(false);
   const [popupContent, setPopupContent] = React.useState<PopupContent>();
+  // const [hoveredClusterId, setHoveredClusterId] = React.useState<number | null>(
+  //   null
+  // );
+  const [clusterHullGeoJson, setClusterHullGeoJson] =
+    React.useState<FeatureCollection | null>(null);
 
   const { loading, texasGEOJson } = useTexasGEOJson();
   // Prepare points
@@ -66,7 +72,7 @@ export default function MapRender({
   // Set up Supercluster
   const index = React.useMemo(() => {
     const supercluster = new Supercluster({
-      radius: 50,
+      radius: 60,
       maxZoom: 16,
     });
     supercluster.load(points);
@@ -99,6 +105,11 @@ export default function MapRender({
     >
       {clusters.map((cluster, idx) => {
         const [longitude, latitude] = cluster.geometry.coordinates;
+        const pointCount = cluster.properties.point_count;
+        let bgColor = "blue-600";
+        if (pointCount > 100) bgColor = "red-600";
+        else if (pointCount > 50) bgColor = "orange-500";
+        else if (pointCount > 20) bgColor = "yellow-500";
 
         // If it's a cluster
         if (cluster.properties.cluster) {
@@ -120,7 +131,34 @@ export default function MapRender({
                 });
               }}
             >
-              <div className="bg-primary text-white rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold shadow-lg cursor-pointer hover:scale-105 transition">
+              <div
+                className={`w-10 h-10 rounded-full border-4 border-${bgColor} ${
+                  "bg-" + bgColor + "/50"
+                } text-white text-sm font-bold flex items-center justify-center shadow-md transition-transform transform hover:scale-110 cursor-pointer border- `}
+                style={{
+                  boxShadow:
+                    "0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.3)",
+                }}
+                onMouseEnter={() => {
+                  // setHoveredClusterId(cluster.id);
+                  const leaves = index.getLeaves(cluster.id, Infinity);
+                  const points = leaves.map((leaf) =>
+                    turf.point((leaf.geometry as Point).coordinates)
+                  );
+                  const fc = turf.featureCollection(points);
+                  const hull = turf.convex(fc);
+                  if (hull) {
+                    setClusterHullGeoJson({
+                      type: "FeatureCollection",
+                      features: [hull],
+                    });
+                  }
+                }}
+                onMouseLeave={() => {
+                  // setHoveredClusterId(null);
+                  setClusterHullGeoJson(null);
+                }}
+              >
                 {cluster.properties.point_count_abbreviated}
               </div>
             </Marker>
@@ -157,6 +195,26 @@ export default function MapRender({
           </Marker>
         );
       })}
+      {clusterHullGeoJson && (
+        <Source id="cluster-hull" type="geojson" data={clusterHullGeoJson}>
+          <Layer
+            id="cluster-hull-layer"
+            type="fill"
+            paint={{
+              "fill-color": "#5b9bd5",
+              "fill-opacity": 0.2,
+            }}
+          />
+          <Layer
+            id="cluster-hull-outline"
+            type="line"
+            paint={{
+              "line-color": "#5b9bd5",
+              "line-width": 2,
+            }}
+          />
+        </Source>
+      )}
 
       {showPopup && popupContent && (
         <Popup
@@ -197,7 +255,7 @@ export default function MapRender({
             id="texas-boundary-layer"
             type="line"
             paint={{
-              "line-color": "blue",
+              "line-color": "#FF0000",
               "line-width": 2,
             }}
           />
