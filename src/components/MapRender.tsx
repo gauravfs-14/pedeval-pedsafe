@@ -1,13 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import * as React from "react";
-import Map, { Marker, NavigationControl, Popup } from "react-map-gl/maplibre";
+import Map, {
+  Layer,
+  Marker,
+  NavigationControl,
+  Popup,
+  Source,
+} from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import Image from "next/image";
 import Supercluster from "supercluster";
 import { Button } from "./ui/button";
 import { X } from "lucide-react";
+import useTexasGEOJson from "@/lib/useTexasGEOJson";
 
 interface MapRenderProps {
   initialViewState?: {
@@ -44,6 +51,7 @@ export default function MapRender({
   const [showPopup, setShowPopup] = React.useState(false);
   const [popupContent, setPopupContent] = React.useState<PopupContent>();
 
+  const { loading, texasGEOJson } = useTexasGEOJson();
   // Prepare points
   const points = React.useMemo(() => {
     return featureCollection.features
@@ -182,6 +190,18 @@ export default function MapRender({
             </ul>
           </div>
         </Popup>
+      )}
+      {texasGEOJson && !loading && (
+        <Source id="texas-boundary" type="geojson" data={texasGEOJson}>
+          <Layer
+            id="texas-boundary-layer"
+            type="line"
+            paint={{
+              "line-color": "blue",
+              "line-width": 2,
+            }}
+          />
+        </Source>
       )}
       <NavigationControl position="top-left" />
       <div className="absolute top-4 right-4 z-10">
