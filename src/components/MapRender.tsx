@@ -16,6 +16,7 @@ import { Button } from "./ui/button";
 import { X } from "lucide-react";
 import useTexasGEOJson from "@/lib/useTexasGEOJson";
 import * as turf from "@turf/turf";
+import { cn } from "@/lib/utils";
 
 interface MapRenderProps {
   initialViewState?: {
@@ -106,10 +107,6 @@ export default function MapRender({
       {clusters.map((cluster, idx) => {
         const [longitude, latitude] = cluster.geometry.coordinates;
         const pointCount = cluster.properties.point_count;
-        let bgColor = "blue-600";
-        if (pointCount > 100) bgColor = "red-600";
-        else if (pointCount > 50) bgColor = "orange-500";
-        else if (pointCount > 20) bgColor = "yellow-500";
 
         // If it's a cluster
         if (cluster.properties.cluster) {
@@ -132,13 +129,18 @@ export default function MapRender({
               }}
             >
               <div
-                className={`w-10 h-10 rounded-full border-4 border-${bgColor} ${
-                  "bg-" + bgColor + "/50"
-                } text-white text-sm font-bold flex items-center justify-center shadow-md transition-transform transform hover:scale-110 cursor-pointer border- `}
-                style={{
-                  boxShadow:
-                    "0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.3)",
-                }}
+                className={cn(
+                  `w-10 h-10 rounded-full border-4 text-white text-sm font-bold flex items-center justify-center shadow-md transition-transform transform hover:scale-110 cursor-pointer`,
+                  pointCount > 500
+                    ? "bg-red-500/50 border-red-200"
+                    : pointCount > 200
+                    ? "bg-orange-500/50 border-orange-200"
+                    : pointCount > 100
+                    ? "bg-purple-500/50 border-purple-200"
+                    : pointCount > 50
+                    ? "bg-yellow-500/50 border-yellow-200"
+                    : "bg-blue-500/50 border-blue-200"
+                )}
                 onMouseEnter={() => {
                   // setHoveredClusterId(cluster.id);
                   const leaves = index.getLeaves(cluster.id, Infinity);
